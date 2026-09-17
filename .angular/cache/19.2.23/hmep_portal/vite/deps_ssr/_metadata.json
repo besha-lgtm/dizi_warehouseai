@@ -1,8 +1,15 @@
 {
+<<<<<<< HEAD
   "hash": "8bfd9bf8",
   "configHash": "ba9e92a7",
   "lockfileHash": "b904b4a6",
   "browserHash": "d339e198",
+=======
+  "hash": "10e63e69",
+  "configHash": "4eb47070",
+  "lockfileHash": "a8f6f28a",
+  "browserHash": "77142677",
+>>>>>>> origin/surya
   "optimized": {},
   "chunks": {}
 }

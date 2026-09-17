@@ -1,374 +1,45 @@
 <div class="expense-review-page">
-
-  <!-- ==================== UPLOAD SCREEN ==================== -->
-  <div class="upload-screen-container" *ngIf="!isUploaded && !isAnalyzing">
-    <div class="upload-box" (click)="fileInput.click()">
-      <div class="upload-icon-wrapper">
-        <i class="pi pi-cloud-upload"></i>
-      </div>
-      <h3>Upload Expense Document</h3>
-      <p>Drag and drop your invoice or receipt here, or <span class="browse-link">browse files</span></p>
-      <span class="file-support-label">Supports PDF, PNG, JPG (Max 10MB)</span>
-      <input type="file" #fileInput (change)="triggerUpload($event)" style="display: none;" accept=".pdf,.png,.jpg,.jpeg" />
-    </div>
+  <!-- ==================== AI CHATBOT ==================== -->
+  <!-- Chat FAB (Floating Action Button) -->
+  <div class="chatbot-fab" (click)="toggleChat()" *ngIf="!isChatOpen">
+    <i class="pi pi-comments"></i>
   </div>
 
-  <!-- ==================== ANALYZING SCREEN ==================== -->
-  <div class="analyzing-screen-container" *ngIf="isAnalyzing">
-    <div class="scanner-card">
-      <div class="spinner-container">
-        <div class="spinner"></div>
-        <i class="pi pi-sparkles scan-sparkle"></i>
+  <!-- Chat Window -->
+  <div class="chatbot-window" [class.open]="isChatOpen">
+    <div class="chatbot-header">
+      <div class="header-left">
+        <div class="bot-avatar"><i class="pi pi-sparkles"></i></div>
+        <div class="bot-info">
+          <h4>DIZI AI</h4>
+          <span>Online</span>
+        </div>
       </div>
-      <h3>Analyzing Document...</h3>
-      <p>DIZI AI is reading the text, calculating taxes, and verifying policy compliance.</p>
-      <div class="scanning-bar"></div>
+      <button class="close-chat-btn" (click)="toggleChat()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="chatbot-messages" #chatScroll>
+      <div *ngFor="let msg of chatMessages" 
+           class="chat-bubble" 
+           [ngClass]="msg.role === 'user' ? 'user-message' : 'bot-message'">
+        <div class="bubble-content">{{ msg.content }}</div>
+      </div>
+      
+      <div class="typing-indicator" *ngIf="isTyping">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="chatbot-input">
+      <input type="text" 
+             placeholder="Ask DIZI AI anything..." 
+             [(ngModel)]="currentMessage" 
+             (keyup.enter)="sendMessage()" />
+      <button class="send-btn" (click)="sendMessage()" [disabled]="!currentMessage.trim()">
+        <i class="pi pi-send"></i>
+      </button>
     </div>
   </div>
-
-  <!-- ==================== FULL WORKSPACE SCREEN ==================== -->
-  <div class="workspace-container" *ngIf="isUploaded && !isAnalyzing">
-
-    <!-- STEPPER HEADER -->
-    <div class="stepper-header-row">
-      <div class="steps-flow">
-        <div class="step-flow-item completed">
-          <span class="step-num-icon"><i class="pi pi-check"></i></span>
-          <div class="step-flow-text">
-            <strong>1 Upload</strong>
-            <span>Document</span>
-          </div>
-        </div>
-        <div class="step-flow-sep">→</div>
-        <div class="step-flow-item completed">
-          <span class="step-num-icon"><i class="pi pi-check"></i></span>
-          <div class="step-flow-text">
-            <strong>2 AI Validate</strong>
-            <span>Extract & Verify</span>
-          </div>
-        </div>
-        <div class="step-flow-sep">→</div>
-        <div class="step-flow-item active">
-          <span class="step-num-icon">3</span>
-          <div class="step-flow-text">
-            <strong>3 Review</strong>
-            <span>Confirm Details</span>
-          </div>
-        </div>
-        <div class="step-flow-sep">→</div>
-        <div class="step-flow-item future">
-          <span class="step-num-icon">4</span>
-          <div class="step-flow-text">
-            <strong>4 Action</strong>
-            <span>Update ERP</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stepper-right-actions">
-        <div class="confidence-badge">
-          <span>AI Confidence</span>
-          <strong><i class="pi pi-sparkles"></i> 96%</strong>
-        </div>
-        <button class="btn-history" (click)="reset()">
-          <i class="pi pi-history"></i> History
-        </button>
-      </div>
-    </div>
-
-    <!-- SUCCESS MESSAGE INSTEAD OF COLUMNS IF POSTED -->
-    <div class="success-screen-card" *ngIf="isPosted">
-      <div class="success-icon-wrapper">
-        <i class="pi pi-check-circle"></i>
-      </div>
-      <h2>Expense Posted Successfully!</h2>
-      <p>Document values have been verified and pushed directly to the ERP ledger.</p>
-      <div class="receipt-summary-block">
-        <div class="summary-line"><span>Vendor:</span> <strong>Novotel Dubai Al Barsha</strong></div>
-        <div class="summary-line"><span>Amount:</span> <strong>1,601.25 AED</strong></div>
-        <div class="summary-line"><span>Reference ID:</span> <strong>ERP-EXP-764512</strong></div>
-      </div>
-      <button class="btn btn-primary mt-4" (click)="reset()">Upload Another Document</button>
-    </div>
-
-    <!-- COLUMNS GRID -->
-    <div class="columns-grid" *ngIf="!isPosted">
-
-      <!-- LEFT COLUMN: TAX INVOICE DOCUMENT -->
-      <div class="column-card document-column">
-        <div class="column-header">
-          <h3>Uploaded Expense Document</h3>
-          <span class="badge-ocr"><i class="pi pi-sparkles"></i> OCR Extracted</span>
-        </div>
-
-        <div class="document-preview-pane">
-          <!-- Novotel Invoice Mock Render -->
-          <div class="invoice-box" [style.transform]="'scale(' + zoomLevel/100 + ') rotate(' + rotation + 'deg)'">
-            <div class="invoice-top">
-              <div class="invoice-brand">
-                <h2>NOVOTEL</h2>
-                <span>HOTELS, SUITES & RESORTS</span>
-              </div>
-              <div class="invoice-type">
-                <h3>Tax Invoice</h3>
-                <div class="invoice-meta-line"><span>Invoice No:</span> <strong>764512</strong></div>
-                <div class="invoice-meta-line"><span>Invoice Date:</span> <strong>14-May-2024</strong></div>
-              </div>
-            </div>
-
-            <div class="invoice-address-row">
-              <div class="address-col">
-                <strong>Novotel Dubai Al Barsha</strong>
-                <p>P.O. Box 450011, Sheikh Zayed Road</p>
-                <p>Dubai, UAE</p>
-                <p>TRN: 100225344900003</p>
-              </div>
-              <div class="guest-col">
-                <div class="meta-inline"><span>Guest Name:</span> <strong>Raju Dantuluri</strong></div>
-                <div class="meta-inline"><span>Room No:</span> <strong>1521</strong></div>
-                <div class="meta-inline"><span>Check-in:</span> <strong>12-May-2024</strong></div>
-                <div class="meta-inline"><span>Check-out:</span> <strong>14-May-2024</strong></div>
-              </div>
-            </div>
-
-            <table class="invoice-table">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Date</th>
-                  <th class="text-right">Amount (AED)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Room Charges</td>
-                  <td>12-May-2024</td>
-                  <td class="text-right">650.00</td>
-                </tr>
-                <tr>
-                  <td>Room Charges</td>
-                  <td>13-May-2024</td>
-                  <td class="text-right">650.00</td>
-                </tr>
-                <tr>
-                  <td>Breakfast</td>
-                  <td>13-May-2024</td>
-                  <td class="text-right">75.00</td>
-                </tr>
-                <tr>
-                  <td>Airport Taxi</td>
-                  <td>14-May-2024</td>
-                  <td class="text-right">120.00</td>
-                </tr>
-                <tr>
-                  <td>Business Centre</td>
-                  <td>14-May-2024</td>
-                  <td class="text-right">30.00</td>
-                </tr>
-                <tr class="summary-row">
-                  <td colspan="2">Sub Total</td>
-                  <td class="text-right">1,525.00</td>
-                </tr>
-                <tr class="summary-row">
-                  <td colspan="2">VAT (5%)</td>
-                  <td class="text-right">76.25</td>
-                </tr>
-                <tr class="total-row">
-                  <td colspan="2">Total Amount</td>
-                  <td class="text-right">1,601.25 AED</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Controls Footer -->
-        <div class="document-controls-footer">
-          <div class="zoom-controls">
-            <button (click)="zoomOut()"><i class="pi pi-minus"></i></button>
-            <span>{{ zoomLevel }}%</span>
-            <button (click)="zoomIn()"><i class="pi pi-plus"></i></button>
-          </div>
-          <div class="extra-controls">
-            <button (click)="rotate()" title="Rotate Document"><i class="pi pi-refresh"></i></button>
-            <button title="Download Original File"><i class="pi pi-download"></i></button>
-          </div>
-        </div>
-      </div>
-
-      <!-- MIDDLE COLUMN: DIZI AI ASSISTANT CHAT -->
-      <div class="column-card chat-column">
-        <div class="column-header">
-          <div class="ai-title-row">
-            <span class="ai-badge-header">AI</span>
-            <h3>DIZI AI Assistant</h3>
-          </div>
-          <span class="soundwaves"><i class="pi pi-volume-up"></i></span>
-        </div>
-
-        <div class="chat-messages-area">
-          <!-- Bot message 1 -->
-          <div class="chat-bubble bot-message">
-            <p>Hi Raju! I have analyzed the expense document. Here's what I found.</p>
-            <span class="msg-time">10:32 AM</span>
-          </div>
-
-          <!-- Table Extracted block -->
-          <div class="extracted-details-table-card">
-            <div class="extracted-title-header">
-              <i class="pi pi-sparkles"></i> Extracted Information
-            </div>
-            
-            <div class="extracted-rows">
-              <div class="extracted-row">
-                <span class="ext-label"><i class="pi pi-user"></i> Vendor</span>
-                <span class="ext-value">Novotel Dubai Al Barsha</span>
-                <span class="ext-check"><i class="pi pi-check-circle"></i></span>
-              </div>
-              <div class="extracted-row">
-                <span class="ext-label"><i class="pi pi-calendar"></i> Date Range</span>
-                <span class="ext-value">12-May-2024 to 14-May-2024</span>
-                <span class="ext-check"><i class="pi pi-check-circle"></i></span>
-              </div>
-              <div class="extracted-row">
-                <span class="ext-label"><i class="pi pi-money-bill"></i> Total Amount</span>
-                <span class="ext-value">1,601.25 AED</span>
-                <span class="ext-check"><i class="pi pi-check-circle"></i></span>
-              </div>
-              <div class="extracted-row">
-                <span class="ext-label"><i class="pi pi-globe"></i> Currency</span>
-                <span class="ext-value">AED</span>
-                <span class="ext-check"><i class="pi pi-check-circle"></i></span>
-              </div>
-              <div class="extracted-row">
-                <span class="ext-label"><i class="pi pi-tag"></i> Category (Suggested)</span>
-                <span class="ext-value">Travel & Stay</span>
-                <span class="ext-check"><i class="pi pi-check-circle"></i></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bot message 2 -->
-          <div class="chat-bubble bot-message">
-            <p>Looks good! Please confirm or update the details before I post this to ERP.</p>
-            <span class="msg-time">10:33 AM</span>
-          </div>
-
-          <!-- Bot message 3 -->
-          <div class="chat-bubble bot-message">
-            <p><strong>How would you like to proceed?</strong></p>
-            
-            <div class="chat-action-buttons">
-              <button class="chat-btn-primary" (click)="postToERP()">
-                <i class="pi pi-check"></i> Post to ERP
-              </button>
-              <button class="chat-btn-outline">
-                <i class="pi pi-pencil"></i> Edit Details
-              </button>
-              <button class="chat-btn-danger" (click)="rejectDocument()">
-                <i class="pi pi-times"></i> Reject Document
-              </button>
-            </div>
-            <span class="msg-time">10:33 AM</span>
-          </div>
-        </div>
-
-        <div class="chat-input-row">
-          <input type="text" placeholder="Ask DIZI AI..." readonly />
-          <button class="btn-chat-send"><i class="pi pi-send"></i></button>
-        </div>
-        <span class="ai-footer-note"><i class="pi pi-exclamation-circle"></i> AI suggestions. Please review before final action.</span>
-      </div>
-
-      <!-- RIGHT COLUMN: STATS AND INFO -->
-      <div class="column-card sidebars-column">
-        <!-- Widget 1: Expense Summary -->
-        <div class="sidebar-widget">
-          <div class="widget-header">
-            <i class="pi pi-file"></i>
-            <h4>Expense Summary</h4>
-          </div>
-          <div class="widget-content">
-            <div class="widget-info-row">
-              <span class="w-label">Document Type</span>
-              <span class="w-val">Hotel Invoice</span>
-            </div>
-            <div class="widget-info-row">
-              <span class="w-label">Total Amount</span>
-              <span class="w-val"><strong>1,601.25 AED</strong></span>
-            </div>
-            <div class="widget-info-row">
-              <span class="w-label">Tax Amount</span>
-              <span class="w-val">76.25 AED</span>
-            </div>
-            <div class="widget-info-row">
-              <span class="w-label">Category</span>
-              <span class="w-val">Travel & Stay</span>
-            </div>
-            <div class="widget-info-row">
-              <span class="w-label">Payment Mode</span>
-              <span class="w-val">Company Card</span>
-            </div>
-
-            <button class="btn-widget-link">
-              <span>View Line Items</span> <i class="pi pi-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Widget 2: AI Insights -->
-        <div class="sidebar-widget">
-          <div class="widget-header">
-            <i class="pi pi-sparkles"></i>
-            <h4>AI Insights</h4>
-          </div>
-          <div class="widget-content">
-            <div class="insight-row positive">
-              <i class="pi pi-check-circle"></i>
-              <div class="insight-text">
-                <strong>All details extracted successfully</strong>
-                <span>Confidence: 96%</span>
-              </div>
-            </div>
-            <div class="insight-row info">
-              <i class="pi pi-info-circle"></i>
-              <div class="insight-text">
-                <strong>This expense is within policy</strong>
-                <span>Travel Policy: Approved</span>
-              </div>
-            </div>
-            <div class="insight-row info">
-              <i class="pi pi-info-circle"></i>
-              <div class="insight-text">
-                <strong>GST/VAT calculated correctly</strong>
-                <span>VAT (5%): 76.25 AED</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Widget 3: Communication -->
-        <div class="sidebar-widget">
-          <div class="widget-header">
-            <i class="pi pi-comments"></i>
-            <h4>Communication</h4>
-          </div>
-          <div class="widget-content communication-list">
-            <a href="javascript:void(0)" class="comm-link">
-              <i class="pi pi-envelope"></i> Send Email
-            </a>
-            <a href="javascript:void(0)" class="comm-link">
-              <i class="pi pi-phone"></i> Send WhatsApp
-            </a>
-            <a href="javascript:void(0)" class="comm-link">
-              <i class="pi pi-comment"></i> Add Comment
-            </a>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
 </div>
