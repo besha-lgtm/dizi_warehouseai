@@ -1,34 +1,19 @@
 import {
   DomHandler
-<<<<<<< HEAD
 } from "./chunk-BUGEQH7Q.js";
 import {
   SharedModule,
   UniqueComponentId
 } from "./chunk-5OUMYVAS.js";
-=======
-} from "./chunk-LRZ2MEGS.js";
-import {
-  SharedModule,
-  UniqueComponentId
-} from "./chunk-IOYYT5VO.js";
->>>>>>> origin/surya
 import {
   CommonModule,
   NgClass,
   NgIf,
   NgStyle
-<<<<<<< HEAD
 } from "./chunk-G5PNO5CW.js";
 import {
   DOCUMENT
 } from "./chunk-2UTZ6EIC.js";
-=======
-} from "./chunk-AOOG2IZ5.js";
-import {
-  DOCUMENT
-} from "./chunk-DZTGA4BT.js";
->>>>>>> origin/surya
 import {
   ChangeDetectionStrategy,
   Component,
@@ -56,17 +41,10 @@ import {
   ɵɵtemplate,
   ɵɵtext,
   ɵɵtextInterpolate
-<<<<<<< HEAD
 } from "./chunk-3GACGZJ4.js";
 import "./chunk-FFZIAYYX.js";
 import "./chunk-6Q4RANH6.js";
 import "./chunk-CXCX2JKZ.js";
-=======
-} from "./chunk-JOOTFISH.js";
-import "./chunk-Q7YHLGLO.js";
-import "./chunk-2LVKW5TZ.js";
-import "./chunk-4GNDKFTC.js";
->>>>>>> origin/surya
 
 // node_modules/primeng/fesm2022/primeng-badge.mjs
 function Badge_span_0_Template(rf, ctx) {

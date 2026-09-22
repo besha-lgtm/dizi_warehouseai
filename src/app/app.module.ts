@@ -9,7 +9,7 @@ import { HeaderComponent } from "./layout/header/header.component";
 import { SidebarComponent } from "./layout/sidebar/sidebar.component";
 import { ModuleLayoutComponent } from "./layout/module-layout/module-layout.component";
 import { LoginComponent } from "./login/login.component";
-import { ExpenseReviewComponent } from "./pages/expense-review/expense-review.component";
+
 
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,6 +33,8 @@ import { BadgeModule } from 'primeng/badge';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TagModule } from 'primeng/tag';
 import { FileUploadModule } from 'primeng/fileupload';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { WarehouseaiComponent } from './pages/warehouseai/warehouseai.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +44,8 @@ import { FileUploadModule } from 'primeng/fileupload';
     SidebarComponent,
     ModuleLayoutComponent,
     LoginComponent,
-    ExpenseReviewComponent
+    DashboardComponent,
+    WarehouseaiComponent
   ],
   imports: [
     BrowserModule,

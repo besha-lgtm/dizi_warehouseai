@@ -6,7 +6,7 @@
     <!-- LOGO -->
     <div class="logo">
         <div class="logo-image">
-            <img src="assets/logo.png" alt="VISIPACK Logo">
+            <img src="assets/logo.jpg" alt="VISIPACK Logo">
         </div>
 
         <div class="logo-text" *ngIf="!isCollapsed">
@@ -25,8 +25,15 @@
 
                 <a routerLink="/dashboard" routerLinkActive="active" (click)="onNavClick()">
                     <i class="pi pi-chart-bar"></i>
+                    <span class="menu-text">Dasboard</span>
+                </a>
+
+                <a routerLink="/warehouseai" routerLinkActive="active" (click)="onNavClick()">
+                    <i class="pi pi-chart-bar"></i>
                     <span class="menu-text">Warehouse AI</span>
                 </a>
+
+
 
 
             </div>
@@ -37,7 +44,7 @@
     <!-- BOTTOM SECTION -->
     <div class="app-sidebar-bottom" *ngIf="!isCollapsed">
         <div class="app-sidebar-version">
-            Version 2.0
+           
         </div>
     </div>
 

@@ -87,11 +87,7 @@ import {
   provideNetlifyLoader,
   registerLocaleData,
   setRootDomAdapter
-<<<<<<< HEAD
 } from "./chunk-G5PNO5CW.js";
-=======
-} from "./chunk-AOOG2IZ5.js";
->>>>>>> origin/surya
 import {
   DOCUMENT,
   PLATFORM_BROWSER_ID,
@@ -100,7 +96,6 @@ import {
   isPlatformBrowser,
   isPlatformServer,
   parseCookieValue
-<<<<<<< HEAD
 } from "./chunk-2UTZ6EIC.js";
 import {
   IMAGE_CONFIG
@@ -108,15 +103,6 @@ import {
 import "./chunk-FFZIAYYX.js";
 import "./chunk-6Q4RANH6.js";
 import "./chunk-CXCX2JKZ.js";
-=======
-} from "./chunk-DZTGA4BT.js";
-import {
-  IMAGE_CONFIG
-} from "./chunk-JOOTFISH.js";
-import "./chunk-Q7YHLGLO.js";
-import "./chunk-2LVKW5TZ.js";
-import "./chunk-4GNDKFTC.js";
->>>>>>> origin/surya
 export {
   APP_BASE_HREF,
   AsyncPipe,

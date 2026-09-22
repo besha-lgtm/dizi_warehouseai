@@ -1,5 +1,4 @@
 import {
-<<<<<<< HEAD
   ChevronLeftIcon,
   ChevronRightIcon
 } from "./chunk-7XNXBSKN.js";
@@ -18,35 +17,11 @@ import "./chunk-55APRCH2.js";
 import {
   DomHandler
 } from "./chunk-BUGEQH7Q.js";
-=======
-  Tooltip,
-  TooltipModule
-} from "./chunk-VJ3I3XJL.js";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon
-} from "./chunk-JUUU6VZG.js";
-import {
-  TimesIcon
-} from "./chunk-5J2OOHUD.js";
-import {
-  Ripple,
-  RippleModule
-} from "./chunk-UV5IJ5GD.js";
-import "./chunk-VHGEPTYG.js";
-import {
-  DomHandler
-} from "./chunk-LRZ2MEGS.js";
->>>>>>> origin/surya
 import {
   PrimeTemplate,
   SharedModule,
   UniqueComponentId
-<<<<<<< HEAD
 } from "./chunk-5OUMYVAS.js";
-=======
-} from "./chunk-IOYYT5VO.js";
->>>>>>> origin/surya
 import {
   CommonModule,
   NgClass,
@@ -54,17 +29,10 @@ import {
   NgIf,
   NgStyle,
   NgTemplateOutlet
-<<<<<<< HEAD
 } from "./chunk-G5PNO5CW.js";
 import {
   isPlatformBrowser
 } from "./chunk-2UTZ6EIC.js";
-=======
-} from "./chunk-AOOG2IZ5.js";
-import {
-  isPlatformBrowser
-} from "./chunk-DZTGA4BT.js";
->>>>>>> origin/surya
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -115,17 +83,10 @@ import {
   ɵɵtext,
   ɵɵtextInterpolate,
   ɵɵviewQuery
-<<<<<<< HEAD
 } from "./chunk-3GACGZJ4.js";
 import "./chunk-FFZIAYYX.js";
 import "./chunk-6Q4RANH6.js";
 import "./chunk-CXCX2JKZ.js";
-=======
-} from "./chunk-JOOTFISH.js";
-import "./chunk-Q7YHLGLO.js";
-import "./chunk-2LVKW5TZ.js";
-import "./chunk-4GNDKFTC.js";
->>>>>>> origin/surya
 
 // node_modules/primeng/fesm2022/primeng-tabview.mjs
 var _c0 = ["*"];
