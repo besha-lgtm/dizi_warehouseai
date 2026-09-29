@@ -10,21 +10,15 @@ import {
   TimesIcon
 } from "./chunk-P5WWGHQJ.js";
 import {
-  Ripple,
-  RippleModule
-} from "./chunk-H3Z5YWEB.js";
-import {
   animate,
   style,
   transition,
   trigger
 } from "./chunk-3EAGWDPE.js";
 import {
-  MessageService,
-  PrimeNGConfig,
-  PrimeTemplate,
-  SharedModule
-} from "./chunk-5OUMYVAS.js";
+  Ripple,
+  RippleModule
+} from "./chunk-HURYQSPF.js";
 import {
   CommonModule,
   NgClass,
@@ -32,7 +26,13 @@ import {
   NgIf,
   NgStyle,
   NgTemplateOutlet
-} from "./chunk-G5PNO5CW.js";
+} from "./chunk-MM6M2NLF.js";
+import {
+  MessageService,
+  PrimeNGConfig,
+  PrimeTemplate,
+  SharedModule
+} from "./chunk-5OUMYVAS.js";
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -703,4 +703,4 @@ export {
   Messages,
   MessagesModule
 };
-//# sourceMappingURL=chunk-BBNPNTQL.js.map
+//# sourceMappingURL=chunk-HM25L4SP.js.map
