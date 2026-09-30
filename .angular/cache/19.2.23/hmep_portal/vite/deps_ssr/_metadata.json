@@ -1,8 +1,15 @@
 {
+<<<<<<< HEAD
   "hash": "c9241674",
   "configHash": "d44e55d8",
   "lockfileHash": "91241675",
   "browserHash": "7c37b19d",
+=======
+  "hash": "9d119cd5",
+  "configHash": "36a90dcb",
+  "lockfileHash": "91241675",
+  "browserHash": "21d0300b",
+>>>>>>> origin/SHIVA
   "optimized": {},
   "chunks": {}
 }
