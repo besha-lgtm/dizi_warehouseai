@@ -2,12 +2,12 @@ import {
   DomHandler
 } from "./chunk-BUGEQH7Q.js";
 import {
-  PrimeNGConfig
-} from "./chunk-5OUMYVAS.js";
-import {
   DOCUMENT,
   isPlatformBrowser
-} from "./chunk-2UTZ6EIC.js";
+} from "./chunk-QXK5Q6XX.js";
+import {
+  PrimeNGConfig
+} from "./chunk-5OUMYVAS.js";
 import {
   Directive,
   ElementRef,
@@ -192,4 +192,4 @@ export {
   Ripple,
   RippleModule
 };
-//# sourceMappingURL=chunk-H3Z5YWEB.js.map
+//# sourceMappingURL=chunk-HURYQSPF.js.map

@@ -5,23 +5,18 @@ import {
 import {
   Tooltip,
   TooltipModule
-} from "./chunk-KNP2LWVQ.js";
+} from "./chunk-6DXR2QCC.js";
 import {
   TimesIcon
 } from "./chunk-P5WWGHQJ.js";
 import {
   Ripple,
   RippleModule
-} from "./chunk-H3Z5YWEB.js";
+} from "./chunk-HURYQSPF.js";
 import "./chunk-55APRCH2.js";
 import {
   DomHandler
 } from "./chunk-BUGEQH7Q.js";
-import {
-  PrimeTemplate,
-  SharedModule,
-  UniqueComponentId
-} from "./chunk-5OUMYVAS.js";
 import {
   CommonModule,
   NgClass,
@@ -29,10 +24,15 @@ import {
   NgIf,
   NgStyle,
   NgTemplateOutlet
-} from "./chunk-G5PNO5CW.js";
+} from "./chunk-MM6M2NLF.js";
 import {
   isPlatformBrowser
-} from "./chunk-2UTZ6EIC.js";
+} from "./chunk-QXK5Q6XX.js";
+import {
+  PrimeTemplate,
+  SharedModule,
+  UniqueComponentId
+} from "./chunk-5OUMYVAS.js";
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -84,8 +84,8 @@ import {
   ɵɵtextInterpolate,
   ɵɵviewQuery
 } from "./chunk-3GACGZJ4.js";
-import "./chunk-FFZIAYYX.js";
 import "./chunk-6Q4RANH6.js";
+import "./chunk-FFZIAYYX.js";
 import "./chunk-CXCX2JKZ.js";
 
 // node_modules/primeng/fesm2022/primeng-tabview.mjs

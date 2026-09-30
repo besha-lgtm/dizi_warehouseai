@@ -1,13 +1,13 @@
 import {
-  PrimeTemplate
-} from "./chunk-5OUMYVAS.js";
-import {
   CommonModule,
   NgClass,
   NgIf,
   NgStyle,
   NgTemplateOutlet
-} from "./chunk-G5PNO5CW.js";
+} from "./chunk-MM6M2NLF.js";
+import {
+  PrimeTemplate
+} from "./chunk-5OUMYVAS.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -330,4 +330,4 @@ export {
   ProgressBar,
   ProgressBarModule
 };
-//# sourceMappingURL=chunk-MVFSUYZT.js.map
+//# sourceMappingURL=chunk-XTQXDYBN.js.map

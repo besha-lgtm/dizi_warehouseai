@@ -1,7 +1,7 @@
 import {
   DOCUMENT,
   isPlatformBrowser
-} from "./chunk-2UTZ6EIC.js";
+} from "./chunk-QXK5Q6XX.js";
 import {
   ApplicationRef,
   Attribute,
@@ -5120,4 +5120,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-G5PNO5CW.js.map
+//# sourceMappingURL=chunk-MM6M2NLF.js.map

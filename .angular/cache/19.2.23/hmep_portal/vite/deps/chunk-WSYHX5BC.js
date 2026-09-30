@@ -12,7 +12,7 @@ import {
 import {
   Ripple,
   RippleModule
-} from "./chunk-H3Z5YWEB.js";
+} from "./chunk-HURYQSPF.js";
 import {
   animate,
   style,
@@ -20,19 +20,19 @@ import {
   trigger
 } from "./chunk-3EAGWDPE.js";
 import {
-  MessageService,
-  PrimeNGConfig,
-  PrimeTemplate,
-  SharedModule
-} from "./chunk-5OUMYVAS.js";
-import {
   CommonModule,
   NgClass,
   NgForOf,
   NgIf,
   NgStyle,
   NgTemplateOutlet
-} from "./chunk-G5PNO5CW.js";
+} from "./chunk-MM6M2NLF.js";
+import {
+  MessageService,
+  PrimeNGConfig,
+  PrimeTemplate,
+  SharedModule
+} from "./chunk-5OUMYVAS.js";
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -703,4 +703,4 @@ export {
   Messages,
   MessagesModule
 };
-//# sourceMappingURL=chunk-BBNPNTQL.js.map
+//# sourceMappingURL=chunk-WSYHX5BC.js.map
