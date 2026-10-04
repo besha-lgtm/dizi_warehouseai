@@ -1,8 +1,4 @@
 import {
-  BrowserModule,
-  DomRendererFactory2
-} from "./chunk-EG26CEJ3.js";
-import {
   AUTO_STYLE,
   AnimationGroupPlayer,
   AnimationMetadataType,
@@ -10,7 +6,6 @@ import {
   sequence,
   style,
   ɵPRE_STYLE
-<<<<<<< HEAD
 } from "./chunk-3EAGWDPE.js";
 import {
   BrowserModule,
@@ -20,13 +15,6 @@ import "./chunk-MM6M2NLF.js";
 import {
   DOCUMENT
 } from "./chunk-QXK5Q6XX.js";
-=======
-} from "./chunk-Q6LKV7KI.js";
-import "./chunk-FHE6SJ26.js";
-import {
-  DOCUMENT
-} from "./chunk-G6QAGPWM.js";
->>>>>>> origin/SHIVA
 import {
   ANIMATION_MODULE_TYPE,
   Inject,
@@ -41,14 +29,9 @@ import {
   ɵɵdefineInjector,
   ɵɵdefineNgModule,
   ɵɵinject
-<<<<<<< HEAD
 } from "./chunk-3GACGZJ4.js";
-=======
-} from "./chunk-FMYFHO36.js";
 import "./chunk-FFZIAYYX.js";
->>>>>>> origin/SHIVA
 import "./chunk-6Q4RANH6.js";
-import "./chunk-FFZIAYYX.js";
 import {
   __objRest,
   __spreadValues

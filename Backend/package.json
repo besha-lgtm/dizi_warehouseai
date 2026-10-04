@@ -1,19 +1,24 @@
 {
-  "name": "warehouse-assistant-llm1",
+  "name": "warehouse-assistant-backend",
   "version": "0.0.1",
   "private": true,
-  "description": "LLM1 (Gemini simple-conversation) API for the Warehouse Assistant chat widget",
+  "description": "Dual-LLM backend for DIZI Warehouse AI: LLM1 (conversational assistant) and LLM2 (SQL data analyst) powered by Google Gemini.",
   "main": "assistant-server.js",
   "scripts": {
-    "start": "node assistant-server.js",
-    "dev": "node --watch assistant-server.js"
+    "start": "concurrently --names \"LLM1,LLM2\" --prefix-colors \"blue,green\" \"node assistant-server.js\" \"node llm2-server.js\"",
+    "dev": "concurrently --names \"LLM1,LLM2\" --prefix-colors \"blue,green\" \"node --watch assistant-server.js\" \"node --watch llm2-server.js\"",
+    "start:llm1": "node assistant-server.js",
+    "start:llm2": "node llm2-server.js"
   },
   "dependencies": {
     "@hapi/boom": "^10.0.1",
     "@hapi/hapi": "^21.3.12",
-    "dotenv": "^16.4.5"
+    "concurrently": "^10.0.5",
+    "dotenv": "^16.4.5",
+    "mysql2": "^3.24.5"
   },
   "engines": {
     "node": ">=18"
   }
 }
+

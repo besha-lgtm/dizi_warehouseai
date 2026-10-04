@@ -40,6 +40,31 @@
            class="chat-bubble" 
            [ngClass]="msg.role === 'user' ? 'user-message' : 'bot-message'">
         <div class="bubble-content">{{ msg.content }}</div>
+
+        <!-- Data table toggle — shown only for LLM2 results that have rows -->
+        <div class="table-actions" *ngIf="msg.role === 'ai' && msg.rows && msg.rows.length > 0">
+          <button class="toggle-table-btn" (click)="toggleTable(msg)">
+            <i class="pi" [ngClass]="msg.showTable ? 'pi-chevron-up' : 'pi-table'"></i>
+            {{ msg.showTable ? 'Hide Data' : 'View Data (' + msg.rows.length + ' records)' }}
+          </button>
+          <div class="data-table-wrapper" *ngIf="msg.showTable">
+            <div class="data-table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th *ngFor="let key of getTableKeys(msg.rows!)">{{ key }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of msg.rows!">
+                    <td *ngFor="let key of getTableKeys(msg.rows!)">{{ row[key] ?? '—' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
       
       <div class="typing-indicator" *ngIf="isTyping">

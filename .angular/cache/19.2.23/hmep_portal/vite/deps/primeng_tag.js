@@ -1,27 +1,15 @@
 import {
-<<<<<<< HEAD
-=======
   PrimeTemplate,
   SharedModule
-} from "./chunk-FXBCPNFE.js";
+} from "./chunk-5OUMYVAS.js";
 import {
->>>>>>> origin/SHIVA
   CommonModule,
   NgClass,
   NgIf,
   NgStyle,
   NgTemplateOutlet
-<<<<<<< HEAD
 } from "./chunk-MM6M2NLF.js";
 import "./chunk-QXK5Q6XX.js";
-import {
-  PrimeTemplate,
-  SharedModule
-} from "./chunk-5OUMYVAS.js";
-=======
-} from "./chunk-FHE6SJ26.js";
-import "./chunk-G6QAGPWM.js";
->>>>>>> origin/SHIVA
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -53,14 +41,9 @@ import {
   ɵɵtemplate,
   ɵɵtext,
   ɵɵtextInterpolate
-<<<<<<< HEAD
 } from "./chunk-3GACGZJ4.js";
-=======
-} from "./chunk-FMYFHO36.js";
 import "./chunk-FFZIAYYX.js";
->>>>>>> origin/SHIVA
 import "./chunk-6Q4RANH6.js";
-import "./chunk-FFZIAYYX.js";
 import "./chunk-CXCX2JKZ.js";
 
 // node_modules/primeng/fesm2022/primeng-tag.mjs

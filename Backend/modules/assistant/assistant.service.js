@@ -30,7 +30,7 @@ exports.handleMessage = async ({ message, history }) => {
   const cleaned = preprocess(message);
   if (!cleaned) throw Boom.badRequest('message is required');
 
-  if (requiresWarehouseData(cleaned)) {
+  if (requiresWarehouseData(cleaned, history)) {
     return { reply: DATA_UNAVAILABLE_REPLY, suggestions: SUGGESTIONS, dataRequired: true };
   }
 

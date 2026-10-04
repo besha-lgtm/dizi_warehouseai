@@ -1,9 +1,6 @@
 import {
   InjectionToken
-} from "./chunk-FMYFHO36.js";
-
-// node_modules/@angular/common/fesm2022/dom_tokens-rA0ACyx7.mjs
-var DOCUMENT = new InjectionToken(ngDevMode ? "DocumentToken" : "");
+} from "./chunk-3GACGZJ4.js";
 
 // node_modules/@angular/common/fesm2022/dom_tokens-rA0ACyx7.mjs
 var DOCUMENT = new InjectionToken(ngDevMode ? "DocumentToken" : "");
@@ -50,8 +47,4 @@ export {
    * License: MIT
    *)
 */
-<<<<<<<< HEAD:.angular/cache/19.2.23/hmep_portal/vite/deps/chunk-QXK5Q6XX.js
 //# sourceMappingURL=chunk-QXK5Q6XX.js.map
-========
-//# sourceMappingURL=chunk-G6QAGPWM.js.map
->>>>>>>> origin/SHIVA:.angular/cache/19.2.23/hmep_portal/vite/deps/chunk-G6QAGPWM.js

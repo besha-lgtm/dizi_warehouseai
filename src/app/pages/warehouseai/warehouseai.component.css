@@ -262,3 +262,56 @@
   padding: 20px;
   overflow-y: auto;
 }
+
+/* ==================== LLM2 DATA TABLE ==================== */
+.table-actions { margin-top: 8px; }
+
+.toggle-table-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #c4b5fd;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-table-btn:hover { background: #ddd6fe; }
+
+.data-table-wrapper {
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+.data-table-scroll {
+  overflow-x: auto;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+.data-table th {
+  background: #6366f1;
+  color: white;
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+.data-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+}
+.data-table tr:nth-child(even) td { background: #f8fafc; }
+.data-table tr:hover td { background: #eff6ff; }

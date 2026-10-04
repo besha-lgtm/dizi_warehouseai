@@ -1,5 +1,4 @@
 import {
-<<<<<<<< HEAD:.angular/cache/19.2.23/hmep_portal/vite/deps/chunk-QY6XZAHG.js
   withHttpTransferCache
 } from "./chunk-XPB3GU6B.js";
 import {
@@ -12,20 +11,6 @@ import {
 import {
   DOCUMENT
 } from "./chunk-QXK5Q6XX.js";
-========
-  EVENT_MANAGER_PLUGINS,
-  EventManagerPlugin
-} from "./chunk-EG26CEJ3.js";
-import {
-  withHttpTransferCache
-} from "./chunk-QYZ7JQGY.js";
-import {
-  getDOM
-} from "./chunk-FHE6SJ26.js";
-import {
-  DOCUMENT
-} from "./chunk-G6QAGPWM.js";
->>>>>>>> origin/SHIVA:.angular/cache/19.2.23/hmep_portal/vite/deps/chunk-N3RH7QD5.js
 import {
   ApplicationRef,
   Console,
@@ -65,7 +50,7 @@ import {
   ɵɵdefineInjector,
   ɵɵdefineNgModule,
   ɵɵinject
-} from "./chunk-FMYFHO36.js";
+} from "./chunk-3GACGZJ4.js";
 
 // node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs
 var Meta = class _Meta {
@@ -835,8 +820,4 @@ export {
    * License: MIT
    *)
 */
-<<<<<<<< HEAD:.angular/cache/19.2.23/hmep_portal/vite/deps/chunk-QY6XZAHG.js
 //# sourceMappingURL=chunk-QY6XZAHG.js.map
-========
-//# sourceMappingURL=chunk-N3RH7QD5.js.map
->>>>>>>> origin/SHIVA:.angular/cache/19.2.23/hmep_portal/vite/deps/chunk-N3RH7QD5.js

@@ -38,18 +38,11 @@ import {
   withNoXsrfProtection,
   withRequestsMadeViaParent,
   withXsrfConfiguration
-<<<<<<< HEAD
 } from "./chunk-XPB3GU6B.js";
 import "./chunk-QXK5Q6XX.js";
 import "./chunk-3GACGZJ4.js";
-=======
-} from "./chunk-QYZ7JQGY.js";
-import "./chunk-G6QAGPWM.js";
-import "./chunk-FMYFHO36.js";
 import "./chunk-FFZIAYYX.js";
->>>>>>> origin/SHIVA
 import "./chunk-6Q4RANH6.js";
-import "./chunk-FFZIAYYX.js";
 import "./chunk-CXCX2JKZ.js";
 export {
   FetchBackend,

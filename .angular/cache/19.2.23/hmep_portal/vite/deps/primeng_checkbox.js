@@ -1,6 +1,5 @@
 import {
   CheckIcon
-<<<<<<< HEAD
 } from "./chunk-YOO7LNXO.js";
 import {
   AutoFocus,
@@ -13,44 +12,19 @@ import {
 } from "./chunk-HFEV7BC3.js";
 import "./chunk-BUGEQH7Q.js";
 import {
-=======
-} from "./chunk-MG3MAXKX.js";
-import "./chunk-66DGAVDH.js";
-import {
-  AutoFocus,
-  AutoFocusModule
-} from "./chunk-2WZZ6LOS.js";
-import "./chunk-BUGEQH7Q.js";
-import {
-  NG_VALUE_ACCESSOR,
-  NgControl
-} from "./chunk-3MBTH6ZN.js";
-import {
-  ObjectUtils,
-  PrimeNGConfig,
-  PrimeTemplate,
-  SharedModule
-} from "./chunk-FXBCPNFE.js";
-import {
->>>>>>> origin/SHIVA
-  CommonModule,
-  NgClass,
-  NgIf,
-  NgStyle,
-  NgTemplateOutlet
-<<<<<<< HEAD
-} from "./chunk-MM6M2NLF.js";
-import "./chunk-QXK5Q6XX.js";
-import {
   ObjectUtils,
   PrimeNGConfig,
   PrimeTemplate,
   SharedModule
 } from "./chunk-5OUMYVAS.js";
-=======
-} from "./chunk-FHE6SJ26.js";
-import "./chunk-G6QAGPWM.js";
->>>>>>> origin/SHIVA
+import {
+  CommonModule,
+  NgClass,
+  NgIf,
+  NgStyle,
+  NgTemplateOutlet
+} from "./chunk-MM6M2NLF.js";
+import "./chunk-QXK5Q6XX.js";
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -96,14 +70,9 @@ import {
   ɵɵtext,
   ɵɵtextInterpolate1,
   ɵɵviewQuery
-<<<<<<< HEAD
 } from "./chunk-3GACGZJ4.js";
-=======
-} from "./chunk-FMYFHO36.js";
 import "./chunk-FFZIAYYX.js";
->>>>>>> origin/SHIVA
 import "./chunk-6Q4RANH6.js";
-import "./chunk-FFZIAYYX.js";
 import "./chunk-CXCX2JKZ.js";
 
 // node_modules/primeng/fesm2022/primeng-checkbox.mjs
