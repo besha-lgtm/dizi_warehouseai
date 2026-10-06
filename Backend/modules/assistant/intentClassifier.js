@@ -2,6 +2,8 @@
 // It only answers one question: does this message need real warehouse data?
 // If not, it's safe for LLM1 (Gemini) to answer directly from conversation alone.
 
+const { isPORelated, parsePOReply, wasWaitingForPO } = require('../analyst/poGate');
+
 // ── Conceptual topics that LLM1 can explain without any DB access ─────────────
 const CONCEPTUAL_TOPICS = '(inventory|stock|receiving|dispatch(ing)?|issuing|sales|forecasting|reporting|operations|warehouse(ing)?|customers?|visuali[sz]ation|supply\\s+chain|procurement|logistics)';
 
@@ -16,9 +18,22 @@ const CONCEPTUAL_PATTERNS = [
   new RegExp('(tell\\s+me\\s+more\\s+about|more\\s+about|know\\s+more\\s+about|learn\\s+more\\s+about|elaborate\\s+on).{0,80}' + CONCEPTUAL_TOPICS, 'i'),
   // "What about receiving?" / "And dispatch?" / "How about operations?"
   new RegExp('^(what\\s+about|and|also|how\\s+about)\\s+.{0,60}' + CONCEPTUAL_TOPICS + '\\b\\s*[?.]?\\s*$', 'i'),
+  // "What is a purchase order?" → definition, no PO data needed
+  /^(what\s+is|what'?s|define|explain)\s+(a|an|the)?\s*purchase\s+order\s*[?.]?\s*$/i,
+  // "What is a product?" → definition, no product data needed
+  /^(what\s+is|what'?s|define|explain)\s+(a|an|the)?\s*product\s*[?.]?\s*$/i,
+  // "What is a project?" → definition, no project data needed
+  /^(what\s+is|what'?s|define|explain)\s+(a|an|the)?\s*project\s*[?.]?\s*$/i,
   // Short conversational follow-ups: "Yes", "Sure", "Ok", "Go on", "Continue"
   /^(yes|yeah|yep|sure|ok|okay|go\s+on|continue|proceed|tell\s+me|please|alright|great)\s*[.!?]?\s*$/i,
 ];
+
+// ── Process questions about how a rule works (answered by LLM1 from the rule list) ──
+const PROCESS_QUESTION_PATTERN =
+  /^(why|how|when|can|cant|can't|could|is it|does)\b.*\b(approve[sd]?|approval|reject(ed)?|releas(e|ed)|dispatch|delet(e|ed)|inspection|qc|stage|batch|plan|grn|spec|pms)\b/i;
+
+// Words that mean the user wants records, not an explanation
+const DATA_ASK_PATTERN = /\b(how\s+many|how\s+much|list|show|count|total|all|pending|which)\b/i;
 
 // ── Data query patterns — these require a real DB query via LLM2 ──────────────
 const DATA_TRIGGER_PATTERNS = [
@@ -66,6 +81,9 @@ const DATA_TRIGGER_PATTERNS = [
   // Stock Transactions / Ledger (wms_db.stock_transactions)
   /\bstock\s+(transaction(s)?|ledger|movement(s)?|history)\b/i,
   /\b(receipt\s+transaction|issue\s+transaction|adjustment)\b/i,
+
+  // Products = warehouse stock items (wms_db.items)
+  /\bproducts?\b/i,
 
   // Parts & part master (project_db)
   /\b(parts?|part\s+(code|name|type|status|master|list|catalog|detail))\b/i,
@@ -129,18 +147,23 @@ const DATA_TRIGGER_PATTERNS = [
 function requiresWarehouseData(message, history = []) {
   const trimmed = message.trim();
 
-  // If previous AI turn asked for a PO number, the user's response is part of the data query
-  if (Array.isArray(history) && history.length > 0) {
-    const lastAiMsg = [...history].reverse().find((m) => m && m.role === 'ai');
-    if (lastAiMsg && /po[- ]?number|purchase\s+order\s+number/i.test(lastAiMsg.content)) {
-      return true;
-    }
+  // If the previous AI turn asked for a PO number and this reply is a PO number (or 'all'),
+  // the reply is part of the data query. Any other reply is a new question.
+  if (wasWaitingForPO(history) && parsePOReply(trimmed)) {
+    return true;
   }
 
-  // Conceptual / conversational → LLM1 handles it (unless answering a PO prompt above)
+  // Conceptual / conversational → LLM1 handles it
   if (CONCEPTUAL_PATTERNS.some((p) => p.test(trimmed))) return false;
 
-  // Data query or PO number → route to LLM2
+  // Process "why / how / can I" questions (e.g. "why can't I approve a GRN?") → LLM1 explains the rule.
+  // Counts, lists and records still go to LLM2.
+  if (PROCESS_QUESTION_PATTERN.test(trimmed) && !DATA_ASK_PATTERN.test(trimmed) && !/\d{3,}/.test(trimmed)) return false;
+
+  // Questions about one specific PO (named or not, e.g. "when will my order arrive") → LLM2
+  if (isPORelated(trimmed)) return true;
+
+  // Data query → route to LLM2
   return DATA_TRIGGER_PATTERNS.some((p) => p.test(trimmed));
 }
 

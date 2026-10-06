@@ -20,6 +20,9 @@ const pool = mysql.createPool({
   user:             process.env.DB_USER     || 'root',
   password:         process.env.DB_PASSWORD || '',
   // No 'database' key — allows cross-database queries
+  // Return DATE/DATETIME as plain strings. Otherwise mysql2 converts them to UTC
+  // timestamps, and dates are shown one day early for users east of UTC.
+  dateStrings: true,
   multipleStatements: false,
   waitForConnections: true,
   connectionLimit: 10,

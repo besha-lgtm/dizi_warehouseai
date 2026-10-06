@@ -1,5 +1,6 @@
 const db = require('./db.client');
 const gemini = require('./gemini.analyst.client');
+const { needsPONumber, parsePOReply, wasWaitingForPO, PO_CODE_REGEX } = require('./poGate');
 
 // ---------------------------------------------------------------------------
 // Full dual-database schema for SQL generation.
@@ -29,7 +30,7 @@ project_db.surface_finish_master (surface_finish_id INT PK, finish_code VARCHAR,
 -- project_db.work_orders: manufacturing work orders
 project_db.work_orders (wo_id INT PK, wo_no VARCHAR, wo_date DATE, project_code VARCHAR, project_name VARCHAR, delivery_date DATE, quantity INT, created_on DATETIME)
 
--- project_db.project_header: customer projects/orders
+-- project_db.project_header: customer projects/orders. Primary key is id. There is NO project_id column in this table.
 project_db.project_header (id INT PK, po_no VARCHAR, po_date DATE, customer_id INT FK->customer_master, project_name VARCHAR, project_code VARCHAR, project_status VARCHAR, priority VARCHAR, quantity INT, project_delivery_date DATE, total_order_value DECIMAL, created_at DATETIME)
 
 -- project_db.project_line: line items within a project
@@ -77,7 +78,7 @@ project_db.part_observations (observation_id INT PK, part_id INT FK->part_master
 -- project_db.part_revision_history: revision history per part
 project_db.part_revision_history (revision_id INT PK, part_id INT FK->part_master, revision_no VARCHAR, revision_date DATE, changes_done VARCHAR)
 
--- project_db.billing_readiness_checklist: billing clearance per project/work order
+-- project_db.billing_readiness_checklist: billing clearance per project/work order. project_id references project_header.id.
 -- All TINYINT flags: 1=Yes, 0=No
 project_db.billing_readiness_checklist (checklist_id INT PK, project_id INT FK->project_header, work_order_id INT FK->work_orders, is_execution_complete TINYINT, is_qc_approved TINYINT, is_ncr_resolved TINYINT, is_final_check_done TINYINT, cleared_for_billing TINYINT, cleared_date DATE)
 
@@ -144,21 +145,9 @@ const CANNOT_ANSWER_REPLY =
 
 
 
-const PO_CODE_REGEX = /\b(s?po[-_ ]?\d+[\w-_]*|po[-_ ]?[a-z0-9_-]+)\b/i;
-
-function isAskingAboutPO(text) {
-  return /\b(purchase\s*order(s)?|po\b|order\s+status|order\s+detail|items?\s+(in|of|for)\s+(the\s+)?(order|po)|received\s+(for|against)\s+(the\s+)?(order|po)|track\s+(the\s+)?(order|po)|delivery\s+of\s+(the\s+)?(order|po))\b/i.test(text);
-}
-
-function isAskingForAllOrAggregate(text) {
-  return /\b(all\s+(purchase\s+orders?|pos?)|list\s+(all\s+)?(purchase\s+orders?|pos?)|how\s+many\s+(purchase\s+orders?|pos?)|count\s+of\s+(purchase\s+orders?|pos?)|show\s+all\s+(purchase\s+orders?|pos?))\b/i.test(text);
-}
-
-function wasWaitingForPO(history) {
-  if (!Array.isArray(history) || history.length === 0) return false;
-  const lastAi = [...history].reverse().find((m) => m && m.role === 'ai');
-  return !!(lastAi && /po[- ]?number|purchase\s+order\s+number/i.test(lastAi.content));
-}
+const PO_PROMPT =
+  "Could you please provide the PO number (e.g., SPO-2026-0001 or PO0001) so I can fetch the specific details for you? " +
+  "(Or reply 'all' if you would like to see all purchase orders.)";
 
 function getPreviousUserQuestion(history) {
   if (!Array.isArray(history) || history.length === 0) return null;
@@ -187,36 +176,17 @@ async function handleQuery({ question, history = [] }) {
 
   let effectiveQuestion = question.trim();
 
-  // ── 2. Handle context if previous assistant turn asked for a PO number ──────
-  if (wasWaitingForPO(history)) {
+  // ── 2. Follow-up to a PO-number prompt: the reply supplies the PO (or 'all') ─
+  // A reply that is not a PO number is treated as a new question instead.
+  const poReply = wasWaitingForPO(history) ? parsePOReply(effectiveQuestion) : null;
+  if (poReply) {
     const prevQ = getPreviousUserQuestion(history) || 'Show purchase order details';
-    const isAll = /^(all|show\s+all|list\s+all|view\s+all|every)\b/i.test(effectiveQuestion);
-    const poMatch = effectiveQuestion.match(PO_CODE_REGEX);
-
-    if (isAll) {
-      effectiveQuestion = `${prevQ} for all purchase orders`;
-    } else if (poMatch) {
-      effectiveQuestion = `${prevQ} for PO number ${poMatch[1].toUpperCase()}`;
-    } else {
-      effectiveQuestion = `${prevQ} for PO number ${effectiveQuestion}`;
-    }
-  } else {
-    // ── 3. Check if a PO number is needed for this query ─────────────────────
-    const hasPO = PO_CODE_REGEX.test(effectiveQuestion);
-    const isAllOrAgg = isAskingForAllOrAggregate(effectiveQuestion);
-    const isPOQuery = isAskingAboutPO(effectiveQuestion);
-
-    if (isPOQuery && !hasPO && !isAllOrAgg) {
-      return {
-        reply:
-          "Could you please provide the PO number (e.g., SPO-2026-0001 or PO0001) so I can fetch the specific details for you? " +
-          "(Or reply 'all' if you would like to see all purchase orders.)",
-        rows: [],
-        sql: null,
-        cannotAnswer: false,
-        waitingForPO: true
-      };
-    }
+    effectiveQuestion = poReply.type === 'all'
+      ? `${prevQ} for all purchase orders`
+      : `${prevQ} for PO number ${poReply.value}`;
+  } else if (needsPONumber(effectiveQuestion)) {
+    // ── 3. Question is about one PO but names none: ask for the PO number first ─
+    return { reply: PO_PROMPT, rows: [], sql: null, cannotAnswer: false, waitingForPO: true };
   }
 
   let sql = null;
@@ -228,15 +198,7 @@ async function handleQuery({ question, history = [] }) {
     // Handle NEEDS_PO_NUMBER sentinel from model (only if no PO is already in the question)
     const hasExplicitPO = PO_CODE_REGEX.test(effectiveQuestion);
     if (sql && sql.toUpperCase().includes('NEEDS_PO_NUMBER') && !hasExplicitPO) {
-      return {
-        reply:
-          "Could you please provide the PO number (e.g., SPO-2026-0001 or PO0001) so I can fetch the specific details for you? " +
-          "(Or reply 'all' if you would like to see all purchase orders.)",
-        rows: [],
-        sql: null,
-        cannotAnswer: false,
-        waitingForPO: true
-      };
+      return { reply: PO_PROMPT, rows: [], sql: null, cannotAnswer: false, waitingForPO: true };
     }
 
     // ── 5. Handle CANNOT_ANSWER sentinel ─────────────────────────────────────
@@ -267,9 +229,11 @@ async function handleQuery({ question, history = [] }) {
 
   } catch (err) {
     console.error('[LLM2] handleQuery error:', err.message);
+    const busy = /\((429|503)\)/.test(err.message);
     return {
-      reply:
-        'An unexpected error occurred while processing your request. Please try again.',
+      reply: busy
+        ? 'The AI service is busy right now. Please try again in a minute.'
+        : 'An unexpected error occurred while processing your request. Please try again.',
       rows: [],
       sql,
       cannotAnswer: false
