@@ -1,6 +1,22 @@
 const db = require('./db.client');
 const gemini = require('./gemini.analyst.client');
 const { needsPONumber, parsePOReply, wasWaitingForPO, PO_CODE_REGEX } = require('./poGate');
+const { classifyMessage } = require('../assistant/intentClassifier');
+
+// ---------------------------------------------------------------------------
+// Ambiguous stock/quantity query patterns (missing target entity)
+// ---------------------------------------------------------------------------
+const AMBIGUOUS_STOCK_PATTERNS = [
+  /^(how|howe)\s+(much|many)(\s+(is|are))?(\s+(left|ledf|remaning|remianing|in\s+stock|available))?\s*[?.]?$/i,
+  /^(what\s+is\s+the\s+)?(remaining|remaning|available)\s+(quantity|stock|balance)\s*[?.]?$/i,
+  /^check\s+(remaining|remaning|available)\s+(stock|quantity)\s*[?.]?$/i,
+  /^(how|howe)\s+much\s+(do\s+we\s+have|is\s+there)\s*[?.]?$/i
+];
+
+function isAmbiguousQuantityQuery(text) {
+  return AMBIGUOUS_STOCK_PATTERNS.some((p) => p.test(text.trim()));
+}
+
 
 // ---------------------------------------------------------------------------
 // Full dual-database schema for SQL generation.
@@ -136,18 +152,49 @@ wms_db.qr_transactions (qr_id BIGINT PK, qr_code VARCHAR, po_id BIGINT FK->purch
 `;
 
 // ---------------------------------------------------------------------------
-// Fallback reply when the LLM cannot map the question to any allowed table.
+// Reply constants — specific controlled responses for each failure mode.
 // ---------------------------------------------------------------------------
+
+/** Generic fallback: Gemini returned CANNOT_ANSWER for a legitimate data question */
 const CANNOT_ANSWER_REPLY =
-  "I couldn't find relevant data for that question. " +
-  'Try asking about items, stock levels, purchase orders, suppliers, GRNs, issue requests, ' +
-  'parts, work orders, projects, materials, NCRs, or billing status.';
+  "I could not find relevant records for that question. " +
+  'You can ask about stock balances, purchase orders, suppliers, goods received notes (GRNs), issue requests, ' +
+  'parts catalog, work orders, projects, materials, NCRs, or billing status. ' +
+  'Please include a specific item name, part code, or PO number where applicable.';
 
+/** Read-only refusal — user tried to mutate data */
+const MUTATION_REPLY =
+  'DIZI operates in read-only mode and cannot create, update, approve, or delete records. ' +
+  'To perform modifications, please use the corresponding section in the warehouse management system, ' +
+  'such as Purchase Orders, Work Order Management, or Inventory Adjustments.';
 
+/** PII / confidentiality refusal */
+const PII_REPLY =
+  'Access restricted: User credentials, employee personal information, and system permission details are confidential and cannot be displayed. ' +
+  'Please contact your system administrator for user and access management.';
+
+/** Out-of-scope domain */
+const OUT_OF_SCOPE_REPLY =
+  "I am DIZI, your warehouse management assistant, and that topic is outside my scope. " +
+  'I can help you look up stock levels, purchase orders, suppliers, work orders, parts catalog, quality reports, billing status, and warehouse procedures. ' +
+  'How can I help you with your warehouse operations?';
+
+/** Non-warehouse coding request refusal */
+const CODING_REPLY =
+  'I am DIZI, your warehouse and manufacturing assistant, and I do not handle general programming or software development requests. ' +
+  "I can help you monitor inventory, track purchase orders, check stock levels, review quality reports, and guide you through warehouse workflows. " +
+  'Please let me know how I can assist with your warehouse operations.';
+
+/** Ambiguous quantity/entity — user asked "how much is left" without naming an item */
+const ENTITY_CLARIFICATION_REPLY =
+  'Could you please specify which item or material you would like to check the quantity for? ' +
+  'For example: *"How much 10ply is left in stock?"* or *"What is the available quantity of item code RAW001?"*';
 
 const PO_PROMPT =
-  "Could you please provide the PO number (e.g., SPO-2026-0001 or PO0001) so I can fetch the specific details for you? " +
+  "Could you please provide the PO number (e.g., SPO-2026-0001) so I can fetch the specific details for you? " +
   "(Or reply 'all' if you would like to see all purchase orders.)";
+
+
 
 function getPreviousUserQuestion(history) {
   if (!Array.isArray(history) || history.length === 0) return null;
@@ -176,7 +223,36 @@ async function handleQuery({ question, history = [] }) {
 
   let effectiveQuestion = question.trim();
 
-  // ── 2. Follow-up to a PO-number prompt: the reply supplies the PO (or 'all') ─
+  // ── 2. Guardrails: Pre-screen for blocked queries (Security, Mutation, PII, Out-of-Scope)
+  const classification = classifyMessage(effectiveQuestion, history);
+  if (classification.route === 'BLOCK') {
+    switch (classification.reason) {
+      case 'SQL_INJECTION':
+        return {
+          reply: 'Your message contains characters or syntax patterns that are restricted for security reasons. Please rephrase your question in plain language.',
+          rows: [],
+          sql: null,
+          cannotAnswer: false
+        };
+      case 'PII':
+        return { reply: PII_REPLY, rows: [], sql: null, cannotAnswer: false };
+      case 'MUTATION':
+        return { reply: MUTATION_REPLY, rows: [], sql: null, cannotAnswer: false };
+      case 'CODING':
+        return { reply: CODING_REPLY, rows: [], sql: null, cannotAnswer: false };
+      case 'OUT_OF_SCOPE':
+        return { reply: OUT_OF_SCOPE_REPLY, rows: [], sql: null, cannotAnswer: false };
+      default:
+        return { reply: CANNOT_ANSWER_REPLY, rows: [], sql: null, cannotAnswer: true };
+    }
+  }
+
+  // ── 3. Check for ambiguous quantity query (e.g. "How much is left?" without naming item)
+  if (isAmbiguousQuantityQuery(effectiveQuestion)) {
+    return { reply: ENTITY_CLARIFICATION_REPLY, rows: [], sql: null, cannotAnswer: false };
+  }
+
+  // ── 4. Follow-up to a PO-number prompt: the reply supplies the PO (or 'all') ─
   // A reply that is not a PO number is treated as a new question instead.
   const poReply = wasWaitingForPO(history) ? parsePOReply(effectiveQuestion) : null;
   if (poReply) {
@@ -185,14 +261,14 @@ async function handleQuery({ question, history = [] }) {
       ? `${prevQ} for all purchase orders`
       : `${prevQ} for PO number ${poReply.value}`;
   } else if (needsPONumber(effectiveQuestion)) {
-    // ── 3. Question is about one PO but names none: ask for the PO number first ─
+    // ── 5. Question is about one PO but names none: ask for the PO number first ─
     return { reply: PO_PROMPT, rows: [], sql: null, cannotAnswer: false, waitingForPO: true };
   }
 
   let sql = null;
 
   try {
-    // ── 4. Generate SQL ───────────────────────────────────────────────────────
+    // ── 6. Generate SQL ───────────────────────────────────────────────────────
     sql = await gemini.generateSQL({ schema: SCHEMA, question: effectiveQuestion });
 
     // Handle NEEDS_PO_NUMBER sentinel from model (only if no PO is already in the question)
@@ -201,17 +277,23 @@ async function handleQuery({ question, history = [] }) {
       return { reply: PO_PROMPT, rows: [], sql: null, cannotAnswer: false, waitingForPO: true };
     }
 
-    // ── 5. Handle CANNOT_ANSWER sentinel ─────────────────────────────────────
+    // ── 7. Handle CANNOT_ANSWER sentinel ─────────────────────────────────────
     if (!sql || sql.toUpperCase().includes('CANNOT_ANSWER')) {
       return { reply: CANNOT_ANSWER_REPLY, rows: [], sql: null, cannotAnswer: true };
     }
 
-    // ── 6. Execute SQL ────────────────────────────────────────────────────────
+    // ── 8. Execute SQL ────────────────────────────────────────────────────────
     let rows;
     try {
       rows = await db.query(sql);
     } catch (dbErr) {
       console.error('[LLM2] DB execution error:', dbErr.message);
+      if (dbErr.message.includes('not permitted')) {
+        return { reply: PII_REPLY, rows: [], sql: null, cannotAnswer: false };
+      }
+      if (dbErr.message.includes('Only SELECT')) {
+        return { reply: MUTATION_REPLY, rows: [], sql: null, cannotAnswer: false };
+      }
       return {
         reply:
           'I generated a query but it could not be executed against the database. ' +

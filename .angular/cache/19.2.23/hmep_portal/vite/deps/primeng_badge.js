@@ -2,18 +2,18 @@ import {
   DomHandler
 } from "./chunk-BUGEQH7Q.js";
 import {
-  SharedModule,
-  UniqueComponentId
-} from "./chunk-FXBCPNFE.js";
-import {
   CommonModule,
   NgClass,
   NgIf,
   NgStyle
-} from "./chunk-FHE6SJ26.js";
+} from "./chunk-MM6M2NLF.js";
 import {
   DOCUMENT
-} from "./chunk-G6QAGPWM.js";
+} from "./chunk-QXK5Q6XX.js";
+import {
+  SharedModule,
+  UniqueComponentId
+} from "./chunk-5OUMYVAS.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -41,9 +41,9 @@ import {
   ɵɵtemplate,
   ɵɵtext,
   ɵɵtextInterpolate
-} from "./chunk-FMYFHO36.js";
-import "./chunk-6Q4RANH6.js";
+} from "./chunk-3GACGZJ4.js";
 import "./chunk-FFZIAYYX.js";
+import "./chunk-6Q4RANH6.js";
 import "./chunk-CXCX2JKZ.js";
 
 // node_modules/primeng/fesm2022/primeng-badge.mjs

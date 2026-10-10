@@ -146,7 +146,8 @@ Write a clear, concise, friendly prose answer to the user's question based on th
 - If a date is empty (null), say the date is "not yet set". Do not leave it out.
 - Describe status only with the status values that appear in the data. Do not add statuses that are not in the rows.
 - Never mention table names or column names directly — translate them to plain English.
-- Never mention company staff names or personal information.`;
+- Never mention company staff names or personal information.
+- Do not use emojis in your response. Keep the tone clean, well-formatted, and professional.`;
 
   const sample = rows.slice(0, 50);
   const userMessage = `User asked: "${question}"
