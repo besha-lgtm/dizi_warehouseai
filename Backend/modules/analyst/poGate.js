@@ -31,6 +31,14 @@ const DELIVERY_REGEX =
 
 const AGGREGATE_REGEX = /\b(all|every|list|how\s+many|count|summary|overview)\b/i;
 
+// "purchase order items", "PO line items", "purchase order records" — these name the
+// RECORD TYPE (the wms_db.purchase_order_items table), not one specific order, even
+// though "purchase order"/"PO" is grammatically singular. Only exempts when paired with
+// an aggregate word (AGGREGATE_REGEX), so "show my PO items" still asks for the PO —
+// only a count/list/total-style question like "how many purchase order items are there"
+// is treated as an aggregate question over all records.
+const PO_ITEMS_AGGREGATE_REGEX = /\b(?:purchase\s+order|po)\s+(?:line\s+)?(?:items?|records?|entries)\b/i;
+
 /**
  * True when the question is about one specific PO but does not name it,
  * so LLM2 must ask for the PO number first.
@@ -43,6 +51,7 @@ function needsPONumber(text) {
   if (PO_CODE_REGEX.test(q) || ORDER_NO_REGEX.test(q)) return false; // PO already given
   if (CREATE_REGEX.test(q)) return false;
   if (PLURAL_PO_REGEX.test(q)) return false; // listing / aggregate question
+  if (PO_ITEMS_AGGREGATE_REGEX.test(q) && AGGREGATE_REGEX.test(q)) return false; // e.g. "how many purchase order items are there"
   if (SINGULAR_PO_REGEX.test(q)) return SPEC_REGEX.test(q) || DELIVERY_REGEX.test(q);
   return DELIVERY_REGEX.test(q) && !AGGREGATE_REGEX.test(q);
 }

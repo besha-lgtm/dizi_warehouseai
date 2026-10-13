@@ -38,10 +38,12 @@ const MUTATION_PATTERNS = [
   /\b(update|modify|change|edit|set|alter|revise|adjust|correct|fix)\b.{0,60}\b(stock|quantity|qty|status|price|part|item|order|record|entry|level|value|date|name)\b/i,
   // Create / add / insert / make / generate a new record
   /\b(create|add|insert|make|generate|raise|open|initiate)\b.{0,60}\b(new\s+)?(part|item|order|purchase\s+order|work\s*order|po|grn|ncr|project|supplier|customer|record|entry|product|bom)\b/i,
-  // Approve / reject / cancel / close a record
-  /\b(approve|reject|cancel|close|confirm|release|dispatch|issue|submit)\b.{0,60}\b(work\s*order|wo|purchase\s+order|po|grn|ncr|part|project|request|record|item)\b/i,
+  // Approve / reject / cancel / close a record.
+  // (?!\s+status\b) excludes "approve status of X" / "approval status" — those ask what
+  // the status IS, they never command an action, so they are not a mutation attempt.
+  /\b(approve|reject|cancel|close|confirm|release|dispatch|issue|submit)\b(?!\s+status\b).{0,60}\b(work\s*order|wo|purchase\s+order|po|grn|ncr|part|project|request|record|item)\b/i,
   // Shorthand like "approve WO-2026-001" or "cancel PO-001"
-  /\b(approve|reject|cancel|close|dispatch|release)\b.{0,20}\b(wo|po|grn|ncr|so|spo)[-_]?\w+/i,
+  /\b(approve|reject|cancel|close|dispatch|release)\b(?!\s+status\b).{0,20}\b(wo|po|grn|ncr|so|spo)[-_]?\w+/i,
 ];
 
 // ── PII / Security interceptor — queries for confidential user/employee data ──
@@ -114,7 +116,7 @@ const SQL_INJECTION_PATTERNS = [
 
 // ── Warehouse domain vocabulary — validates warehouse relevance ───────────────
 const WAREHOUSE_DOMAIN_TERMS =
-  /\b(inventory|stock|items?|products?|materials?|parts?|uom|units?\s+of\s+measure|receiving|dispatch(ing)?|shipment|shipping|storage|warehouse|warehousing|shelf|rack|bin|bay|lot|batch|supplier|vendor|customer|branch|purchase\s+order|po|spo|work\s+order|wo|sales\s+order|so|issue\s+request|requisition|receipt|grn|goods?\s+received\s+note|ledger|movement|replenish(ment)?|forecast(ing)?|demand|pms|spec(ification)?|bom|bill\s+of\s+materials|ncr|non[- ]conformance|defect|capa|qc|quality|inspection|observation|billing|clearance|cleared|cycle\s+count|audit|procurement|logistics|supply\s+chain)\b/i;
+  /\b(inventory|stock|items?|products?|materials?|parts?|uom|units?\s+of\s+measure|receiving|dispatch(ing)?|shipment|shipping|storage|warehouse|warehousing|shelf|rack|bin|bay|lot|batch|supplier|vendor|customer|branch|purchase\s+order|po|spo|work\s+order|wo|sales\s+order|so|issue\s+request|requisition|receipt|grns?|goods?\s+received\s+note|ledger|movement|replenish(ment)?|forecast(ing)?|demand|pms|spec(ification)?|boms?|bill\s+of\s+materials|ncrs?|non[- ]conformance|defect|capas?|qc|quality|inspection|observation|billing|clearance|cleared|cycle\s+count|audit|procurement|logistics|supply\s+chain)\b/i;
 
 // ── Allowed greeting / persona / clarification openers ───────────────────────
 const GREETING_OR_PERSONA_TERMS =
@@ -153,7 +155,7 @@ const DATA_TRIGGER_PATTERNS = [
   /\bvendor(s)?\b/i,
 
   // GRN / Receiving (wms_db)
-  /\bgrn\b/i,
+  /\bgrns?\b/i,
   /\bgoods?\s+received\s+note\b/i,
   /\b(receiving\s+(record|history|log|status|summary)|receipt(s)?)\b/i,
   /\b(accepted\s+qty|rejected\s+qty|rejection\s+reason)\b/i,
@@ -188,15 +190,15 @@ const DATA_TRIGGER_PATTERNS = [
   /\bpo\s+(no|number|date)\b/i,
 
   // BOM (project_db)
-  /\bbom\b/i,
+  /\bboms?\b/i,
   /\bbill\s+of\s+materials?\b/i,
   /\bbom\s+(lines?|detail|parts?)\b/i,
 
   // NCR / Quality (project_db)
-  /\bncr\b/i,
+  /\bncrs?\b/i,
   /\bnon[- ]conforman(ce|t)\b/i,
   /\b(defect|defective|rejected|rejection)\b/i,
-  /\bcapa\b/i,
+  /\bcapas?\b/i,
   /\b(root\s+cause|corrective\s+action|preventive\s+action)\b/i,
   /\b(quality|qc|inspection)\s+(report|status|stage|check|approved?)\b/i,
 
@@ -220,7 +222,7 @@ const DATA_TRIGGER_PATTERNS = [
   /\b(ready\s+for\s+billing|billing\s+approved?)\b/i,
 
   // Generic data intent
-  /\b(show|list|give\s+me|display|fetch|get|find)\b.{0,40}\b(all|active|inactive|pending|completed|open|closed|approved|rejected|draft|submitted)\b/i,
+  /\b(show|list|give(\s+me)?|display|fetch|get|find)\b.{0,40}\b(all|active|inactive|pending|completed|open|closed|approved|rejected|draft|submitted)\b/i,
   /\b(how\s+many|count\s+of|total\s+number\s+of)\b/i,
   /\b(status\s+of|summary\s+of|details?\s+of|info\s+(on|about))\b/i,
 
@@ -254,30 +256,11 @@ function classifyMessage(message, history = []) {
     return { route: 'BLOCK', reason: 'PII' };
   }
 
-  // 2. Data-mutation requests → BLOCK before data triggers fire
-  if (MUTATION_PATTERNS.some((p) => p.test(trimmed))) {
-    return { route: 'BLOCK', reason: 'MUTATION' };
-  }
-
-  // 3. Coding & programming requests → BLOCK immediately (saves LLM tokens!)
-  if (CODING_PATTERNS.some((p) => p.test(trimmed))) {
-    return { route: 'BLOCK', reason: 'CODING' };
-  }
-
-  // 4. Out-of-scope domain topics → BLOCK before data triggers fire
-  if (OUT_OF_SCOPE_PATTERNS.some((p) => p.test(trimmed))) {
-    return { route: 'BLOCK', reason: 'OUT_OF_SCOPE' };
-  }
-
-  // 5. PO follow-up reply
-  if (wasWaitingForPO(history) && parsePOReply(trimmed)) {
-    return { route: 'LLM2' };
-  }
-
-  // 6. Conceptual / conversational warehouse explanation → LLM1
-  if (CONCEPTUAL_PATTERNS.some((p) => p.test(trimmed))) return { route: 'LLM1' };
-
-  // 7. Process "why / how / can I" questions → LLM1 explains the rule
+  // 2. Process "why / how / can I" questions → LLM1 explains the rule.
+  // Checked before MUTATION, so a question about a rule ("why can't I approve a GRN
+  // without inspection?") is not mistaken for a command to perform the action. A message
+  // that still names a real record (3+ digit run, e.g. a PO number) skips this and falls
+  // through to the MUTATION check below, which stays conservative for those.
   if (
     PROCESS_QUESTION_PATTERN.test(trimmed) &&
     !DATA_ASK_PATTERN.test(trimmed) &&
@@ -285,6 +268,29 @@ function classifyMessage(message, history = []) {
   ) {
     return { route: 'LLM1' };
   }
+
+  // 3. Data-mutation requests → BLOCK before data triggers fire
+  if (MUTATION_PATTERNS.some((p) => p.test(trimmed))) {
+    return { route: 'BLOCK', reason: 'MUTATION' };
+  }
+
+  // 4. Coding & programming requests → BLOCK immediately (saves LLM tokens!)
+  if (CODING_PATTERNS.some((p) => p.test(trimmed))) {
+    return { route: 'BLOCK', reason: 'CODING' };
+  }
+
+  // 5. Out-of-scope domain topics → BLOCK before data triggers fire
+  if (OUT_OF_SCOPE_PATTERNS.some((p) => p.test(trimmed))) {
+    return { route: 'BLOCK', reason: 'OUT_OF_SCOPE' };
+  }
+
+  // 6. PO follow-up reply
+  if (wasWaitingForPO(history) && parsePOReply(trimmed)) {
+    return { route: 'LLM2' };
+  }
+
+  // 7. Conceptual / conversational warehouse explanation → LLM1
+  if (CONCEPTUAL_PATTERNS.some((p) => p.test(trimmed))) return { route: 'LLM1' };
 
   // 8. Questions about one specific PO → LLM2
   if (isPORelated(trimmed)) return { route: 'LLM2' };

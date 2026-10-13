@@ -37,8 +37,8 @@ project_db.parts (part_id INT PK, part_code VARCHAR, part_name VARCHAR, drawing_
 -- project_db.part_type_master: lookup for part type names
 project_db.part_type_master (part_type_id INT PK, part_type_code VARCHAR, part_type_name VARCHAR, is_active CHAR)
 
--- project_db.material_master: raw materials catalog (is_active: 'Y'=Active, 'N'=Inactive)
-project_db.material_master (material_id INT PK, material_code VARCHAR, material_name VARCHAR, specification VARCHAR, notes TEXT, is_active CHAR('Y'=Active,'N'=Inactive))
+-- project_db.material_master: raw materials catalog (is_active: 'A'=Active — the only value seen in the data; no inactive rows exist today, so an inactive marker is unconfirmed)
+project_db.material_master (material_id INT PK, material_code VARCHAR, material_name VARCHAR, specification VARCHAR, notes TEXT, is_active CHAR('A'=Active))
 
 -- project_db.surface_finish_master: surface finish types
 project_db.surface_finish_master (surface_finish_id INT PK, finish_code VARCHAR, finish_name VARCHAR, finish_category VARCHAR, is_active CHAR, display_order INT)

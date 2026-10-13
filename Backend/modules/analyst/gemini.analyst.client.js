@@ -112,7 +112,7 @@ Rules:
   * A question about one specific purchase order MUST name it by po_number. If the question refers to one order but no PO number is given, output exactly: NEEDS_PO_NUMBER
   * For goods received (GRN) → use wms_db.receiving_verification JOIN wms_db.receiving_items.
   * For issue requests → use wms_db.issue_requests JOIN wms_db.issue_request_items.
-  * For active materials → use project_db.material_master WHERE is_active = 'Y'.
+  * For active materials → use project_db.material_master WHERE is_active = 'A'.
   * For billing clearance → use project_db.billing_readiness_checklist (cleared_for_billing = 1 means cleared).
   * For projects → use project_db.project_header. Projects "in progress", "ongoing" or "open" mean project_status = 'OPEN' (the only status in the data today). "Projects" with no status word means all rows.
 - Add LIMIT 100 unless the user asks for all records.
