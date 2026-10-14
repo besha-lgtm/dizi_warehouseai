@@ -4,6 +4,13 @@ const FALLBACK_MODELS = [PRIMARY_MODEL, 'gemini-3.6-flash', 'gemini-3.7-flash'];
 // Waits before retrying when every model is overloaded (429/503)
 const OVERLOAD_RETRY_DELAYS_MS = [3000, 8000];
 
+// Running total of Gemini token usage for this server process (resets on restart).
+const usage = { totalTokens: 0, promptTokens: 0, completionTokens: 0, requests: 0 };
+
+function getTokenUsage() {
+  return { ...usage };
+}
+
 /**
  * Gemini call with back-off retries when all models are overloaded.
  * @param {{ systemInstruction: string, userMessage: string }} opts
@@ -59,6 +66,13 @@ async function callGeminiOnce({ systemInstruction, userMessage }) {
       }
 
       const data = await response.json();
+      const u = data?.usageMetadata;
+      if (u) {
+        usage.promptTokens += u.promptTokenCount || 0;
+        usage.completionTokens += u.candidatesTokenCount || 0;
+        usage.totalTokens += u.totalTokenCount || 0;
+        usage.requests += 1;
+      }
       return data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
     } catch (err) {
       lastError = err;
@@ -160,4 +174,4 @@ Write a helpful prose summary:`;
   return callGemini({ systemInstruction, userMessage });
 }
 
-module.exports = { generateSQL, generateSummary };
+module.exports = { generateSQL, generateSummary, getTokenUsage };

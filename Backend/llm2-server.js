@@ -1,6 +1,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const Hapi = require('@hapi/hapi');
 const analystRoutes = require('./modules/analyst/analyst.routes');
+const { getTokenUsage } = require('./modules/analyst/gemini.analyst.client');
 
 const start = async () => {
   const server = Hapi.server({
@@ -20,6 +21,7 @@ const start = async () => {
       path: '/api/health',
       handler: () => ({ status: 'ok', service: 'LLM2 Analyst' })
     },
+    { method: 'GET', path: '/api/usage', handler: () => ({ success: true, data: getTokenUsage() }) },
     ...analystRoutes
   ]);
 

@@ -31,3 +31,79 @@
   padding: 20px;
   overflow-y: auto;
 }
+
+/* Token usage cards — minimal but with a touch of color and depth */
+.token-cards {
+  display: flex;
+  gap: 16px;
+}
+
+.token-card {
+  --accent: #6366f1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 220px;
+  padding: 14px 18px;
+  border: 1px solid #ececec;
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.token-card:hover {
+  box-shadow: 0 4px 10px rgba(16, 24, 40, 0.08);
+  transform: translateY(-1px);
+}
+
+.token-card--llm1 { --accent: #6366f1; }
+.token-card--llm2 { --accent: #14b8a6; }
+
+.token-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 12%, white);
+  color: var(--accent);
+}
+
+.token-card__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.token-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.token-card__label {
+  font-size: 11px;
+  color: #8a8a8a;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.token-card__value {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1f2430;
+  line-height: 1.2;
+}
+
+.token-card__breakdown {
+  font-size: 11px;
+  color: #9a9a9a;
+}
+
+.token-card__breakdown--offline {
+  color: #c0392b;
+}

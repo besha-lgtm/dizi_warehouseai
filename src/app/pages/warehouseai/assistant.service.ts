@@ -18,13 +18,30 @@ export interface AssistantResponse {
   data: AssistantReply;
 }
 
+export interface TokenUsage {
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  requests: number;
+}
+
+export interface TokenUsageResponse {
+  success: boolean;
+  data: TokenUsage;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AssistantService {
-  private readonly apiUrl = 'http://localhost:4300/api/assistant/chat';
+  private readonly baseUrl = 'http://localhost:4300';
+  private readonly apiUrl = `${this.baseUrl}/api/assistant/chat`;
 
   constructor(private http: HttpClient) {}
 
   sendMessage(message: string, history: ChatHistoryItem[]): Observable<AssistantResponse> {
     return this.http.post<AssistantResponse>(this.apiUrl, { message, history });
+  }
+
+  getUsage(): Observable<TokenUsageResponse> {
+    return this.http.get<TokenUsageResponse>(`${this.baseUrl}/api/usage`);
   }
 }

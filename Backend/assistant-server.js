@@ -1,6 +1,7 @@
 require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const assistantRoutes = require('./modules/assistant/assistant.routes');
+const { getTokenUsage } = require('./modules/assistant/gemini.client');
 
 const start = async () => {
   const server = Hapi.server({
@@ -16,6 +17,7 @@ const start = async () => {
 
   server.route([
     { method: 'GET', path: '/api/health', handler: () => ({ status: 'ok' }) },
+    { method: 'GET', path: '/api/usage', handler: () => ({ success: true, data: getTokenUsage() }) },
     ...assistantRoutes
   ]);
 

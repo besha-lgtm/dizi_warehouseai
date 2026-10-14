@@ -7,6 +7,44 @@
 
         <app-header></app-header>
 
+        <div class="page-content">
+            <div class="token-cards">
+
+                <div class="token-card token-card--llm1">
+                    <div class="token-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="token-card__body">
+                        <span class="token-card__label">LLM1 · Assistant tokens</span>
+                        <span class="token-card__value">{{ llm1Usage ? (llm1Usage.totalTokens | number) : '—' }}</span>
+                        <span class="token-card__breakdown" *ngIf="llm1Usage">
+                            {{ llm1Usage.promptTokens | number }} in · {{ llm1Usage.completionTokens | number }} out · {{ llm1Usage.requests | number }} req
+                        </span>
+                        <span class="token-card__breakdown token-card__breakdown--offline" *ngIf="!llm1Usage">service offline</span>
+                    </div>
+                </div>
+
+                <div class="token-card token-card--llm2">
+                    <div class="token-card__icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="token-card__body">
+                        <span class="token-card__label">LLM2 · Analyst tokens</span>
+                        <span class="token-card__value">{{ llm2Usage ? (llm2Usage.totalTokens | number) : '—' }}</span>
+                        <span class="token-card__breakdown" *ngIf="llm2Usage">
+                            {{ llm2Usage.promptTokens | number }} in · {{ llm2Usage.completionTokens | number }} out · {{ llm2Usage.requests | number }} req
+                        </span>
+                        <span class="token-card__breakdown token-card__breakdown--offline" *ngIf="!llm2Usage">service offline</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <router-outlet></router-outlet>
 
     </div>

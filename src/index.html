@@ -5,16 +5,29 @@
   <title>Warehouse AI</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/primeng/resources/primeng.min.css">
-<link rel="stylesheet" href="https://unpkg.com/primeicons/primeicons.css">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+  <!--
+    Google Fonts, loaded without blocking the page.
+    PrimeNG/PrimeIcons CSS is NOT loaded from a CDN here — it is already bundled locally
+    from node_modules via angular.json's "styles" array, so the page works even when a
+    browser or extension (ad/tracker blockers, privacy-focused browsers such as Brave)
+    blocks third-party CDN requests. A blocked or hung CDN <link rel="stylesheet"> can
+    hold up rendering indefinitely in some browsers, which is what made the page appear
+    blank. preload + onload keeps fonts from doing the same: if blocked or slow, the page
+    still renders with the system font instead of staying blank.
+  -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  </noscript>
 </head>
 <body>
   <app-root></app-root>

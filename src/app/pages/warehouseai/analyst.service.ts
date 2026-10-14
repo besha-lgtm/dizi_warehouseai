@@ -18,13 +18,30 @@ export interface AnalystResponse {
   data: AnalystResult;
 }
 
+export interface TokenUsage {
+  totalTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  requests: number;
+}
+
+export interface TokenUsageResponse {
+  success: boolean;
+  data: TokenUsage;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AnalystService {
-  private readonly apiUrl = 'http://localhost:4301/api/analyst/query';
+  private readonly baseUrl = 'http://localhost:4301';
+  private readonly apiUrl = `${this.baseUrl}/api/analyst/query`;
 
   constructor(private http: HttpClient) {}
 
   query(question: string, history: Array<{ role: string; content: string }> = []): Observable<AnalystResponse> {
     return this.http.post<AnalystResponse>(this.apiUrl, { question, history });
+  }
+
+  getUsage(): Observable<TokenUsageResponse> {
+    return this.http.get<TokenUsageResponse>(`${this.baseUrl}/api/usage`);
   }
 }
